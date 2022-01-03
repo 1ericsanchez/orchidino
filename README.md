@@ -6,3 +6,4 @@ The orchidino is intended to track temperature, humidity, and hours of light in 
 The server uses a SQLite3 database to store data readings which are received through HTTP requests. Live sensor readings are received through websockets to be sent to the client front end.
 
 The front end uses React to render the graphs and data tables on the user's browser.
+
