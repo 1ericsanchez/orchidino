@@ -16,6 +16,7 @@ import {
     Line,
     Pie
 } from 'react-chartjs-2';
+import zoomPlugin from 'chartjs-plugin-zoom';
 
 ChartJS.register(
     CategoryScale,
@@ -24,7 +25,8 @@ ChartJS.register(
     LineElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
+    zoomPlugin
 );
 
 // Sample data for bar graph
@@ -85,12 +87,32 @@ export const options = {
         display: true,
         text: 'Chart.js Line Chart - Multi Axis',
       },
+      zoom:{
+        zoom: {
+            wheel:{
+                enabled: true,
+            },
+            pinch:{
+                enabled: true,
+            },
+            mode: 'x',
+        },
+        pan: {
+            enabled: true,
+            drag: true,
+            mode: 'x',
+        },
+      },
+
     },
+
     scales: {
       y: {
         type: 'linear',
         display: true,
         position: 'left',
+        min: 10,
+        max: 15
       },
       y1: {
         type: 'linear',
@@ -99,7 +121,15 @@ export const options = {
         grid: {
           drawOnChartArea: false,
         },
+        min: 20,
+        max: 50
       },
+    },
+    elements:{
+        line:{
+            borderWidth: 2,
+            tension: 0.2
+        }
     },
   };
 
@@ -138,7 +168,8 @@ class Chart extends Component{
     componentDidMount() {
         // Add url to constants so that other computers can load data
         // This may be what's causing the CORS errors
-        axios.get('http://localhost:4000/measurements')
+        // axios.get('http://localhost:4000/measurements')
+        axios.get('http://192.168.0.53:4000/measurements')
         .then(res => {
             const stamps = res.data.map(s => s.createdAt)
             let tempData1 = res.data.map(t => t.temperature)
