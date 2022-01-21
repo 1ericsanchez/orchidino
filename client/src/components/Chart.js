@@ -95,6 +95,10 @@ export const options = {
             pinch:{
                 enabled: true,
             },
+            drag: {
+                enabled: true,
+                modifierKey: 'shift',
+            },
             mode: 'x',
         },
         pan: {
