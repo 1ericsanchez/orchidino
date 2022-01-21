@@ -1,6 +1,6 @@
 const express = require('express')
 
-const { sequelize, Readings } = require('./models')
+const { sequelize, Readings } = require('./db/models')
 
 const app = express()
 
