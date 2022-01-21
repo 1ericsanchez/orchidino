@@ -1,4 +1,5 @@
 const express = require('express')
+const CsvParser = require("json2csv").Parser;
 
 const { sequelize, Readings } = require('./db/models')
 
@@ -44,6 +45,30 @@ app.get('/measurements', async(req, res) => {
     try{
         const r = await Readings.findAll()
         return res.json(r)
+    } catch(err){
+        console.log(err)
+        return res.status(500).json(err)
+    }
+})
+
+// Currently get all measurements in db. 
+// Need to refactor to get date range
+app.get('/measurements/download', async(req, res) => {
+    try{
+        const r = await Readings.findAll()
+        let readings = [];
+        r.forEach((row)=> {
+            const {id, temperature, humidity, light, createdAt} = row;
+            readings.push({id, temperature, humidity, light, createdAt});
+        })
+
+        const csvFields = ["id", "temperature", "description", "published"];
+        const csvParser = new CsvParser({csvFields});
+        const csvData = csvParser.parse(readings)
+
+        res.setHeader("Content-Type", "text/csv");
+        res.setHeader("Content-Disposition", "attachment; filename=readings.csv")
+        res.status(200).end(csvData);
     } catch(err){
         console.log(err)
         return res.status(500).json(err)
