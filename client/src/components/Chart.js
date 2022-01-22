@@ -8,7 +8,8 @@ import {
     LineElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
+    Filler
 } from 'chart.js';
 
 import {
@@ -26,7 +27,8 @@ ChartJS.register(
     Title,
     Tooltip,
     Legend,
-    zoomPlugin
+    zoomPlugin,
+    Filler
 );
 
 // Sample data for bar graph
@@ -147,6 +149,8 @@ function formatChartData(labels, dataset1, dataset2){
             borderColor: 'rgb(255, 99, 132)',
             backgroundColor: 'rgba(255, 99, 132, 0.5)',
             yAxisID: 'y',
+            fill: false
+
           },
           {
             label: 'Dataset 2',
@@ -154,6 +158,7 @@ function formatChartData(labels, dataset1, dataset2){
             borderColor: 'rgb(53, 162, 235)',
             backgroundColor: 'rgba(53, 162, 235, 0.5)',
             yAxisID: 'y1',
+            fill: false,
           },
         ],
       };
