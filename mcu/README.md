@@ -8,9 +8,10 @@ The Orchidino uses an ESP8266 NodeMCU to collect data from the orchidarium and s
     "light": 19
 }
 ```
+## Usage
+To use this Arduino package, create a constants.cpp file containing each of the varialbes described in constants.h. Once the ssid and password have been provided through extern consts, orchidino_ESP.ino can be uploaded to an ESP8266 to connect to Wi-Fi.
 
 ## To Do
-* Make 2.4 GHz channel on router available
-* Add config definitions for wifi connection in ESP file
 * Add DHT-11 functionality
 * Add photoresistor functionality
+* Cite ESP-8266 source
