@@ -14,9 +14,12 @@ To use this Arduino package, create a constants.cpp file containing each of the 
 ### Dependencies
 * DHT sensor library
 * Adafruit Unified Sensor 
+* ArduinoJson
 
 ## To Do
 * Add DHT-11 functionality
-  * Set up POST request for storing data 
+  * ~~Set up POST request for storing data~~
+  * Add response code handling to post request
 * Add photoresistor functionality
 * Setup webserver for providing current conditions to clients
+* Move server ip address to constants and change routes to use format strings
