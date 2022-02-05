@@ -7,6 +7,7 @@ import {
     PointElement,
     LineElement,
     Title,
+    TimeScale,
     Tooltip,
     Legend,
     Filler
@@ -17,11 +18,14 @@ import {
     Line,
     Pie
 } from 'react-chartjs-2';
+
 import zoomPlugin from 'chartjs-plugin-zoom';
+import 'chartjs-adapter-luxon';
 
 ChartJS.register(
     CategoryScale,
     LinearScale,
+    TimeScale,
     PointElement,
     LineElement,
     Title,
@@ -31,117 +35,107 @@ ChartJS.register(
     Filler
 );
 
-// Sample data for bar graph
-const data = {
-    chartData:{
-        labels: ['Seattle', 'Worcester', 'Springfield', 'Lowell', 'Cambridge', 'New Bedford'],
-        datasets:[
-            {
-                label:'Population',
-                data:[
-                    3251,
-                    5135,
-                    5351,
-                    7885,
-                    8745,
-                    4952
-                ]
-            }
-        ]
-    }
-}
 
-// Sample data for multi-y-axis line graph
-// export const data = {
-//     labels,
-//     datasets: [
-//       {
-//         label: 'Dataset 1',
-//         data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-//         borderColor: 'rgb(255, 99, 132)',
-//         backgroundColor: 'rgba(255, 99, 132, 0.5)',
-//         yAxisID: 'y',
-//       },
-//       {
-//         label: 'Dataset 2',
-//         data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-//         borderColor: 'rgb(53, 162, 235)',
-//         backgroundColor: 'rgba(53, 162, 235, 0.5)',
-//         yAxisID: 'y1',
-//       },
-//     ],
-//   };
-
+var options = []
 var dataPoints = []
 
-// const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+// Set chart options after loading the data set
+// This lets you use the date range of the data for setting the zoom limits and view area
+function setOptions(data){
+    const minutes =  15 * 60000;
+    const xMin = Date.parse(data[0].x) - minutes;                               //First element of array minus offset
+    const xMax = Date.parse(data[data.length - 1].x) + minutes;                 //Last element of array plus offset
+    
+    const viewRange = 86400000 * 30                                             // Number of days to show in default view
+    const xViewMin = Math.max(xMin, xMax - viewRange)                           // Default to showing the last 30 days of data
 
-export const options = {
-    maintainAspectRatio:true,
-    responsive: true,
-    interaction: {
-      mode: 'index',
-      intersect: false,
-    },
-    stacked: false,
-    plugins: {
-      title: {
-        display: true,
-        text: 'Chart.js Line Chart - Multi Axis',
-      },
-      zoom:{
-        zoom: {
-            wheel:{
-                enabled: true,
-            },
-            pinch:{
-                enabled: true,
-            },
-            drag: {
-                enabled: true,
-                modifierKey: 'shift',
-            },
-            mode: 'x',
+    const options = {
+        maintainAspectRatio:true,
+        responsive: true,
+        interaction: {
+          mode: 'index',
+          intersect: false,
         },
-        pan: {
-            enabled: true,
-            drag: true,
-            mode: 'x',
+        stacked: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Chart.js Line Chart - Multi Axis',
+          },
+          zoom:{
+            zoom: {
+                wheel:{
+                    enabled: true,
+                },
+                pinch:{
+                    enabled: true,
+                },
+                drag: {
+                    enabled: true,
+                    modifierKey: 'shift',
+                },
+                mode: 'x',
+            },
+            pan: {
+                enabled: true,
+                mode: 'x',
+            },
+            limits: {
+                x: {min: xMin, max: xMax}
+            }
+          },
         },
-      },
-
-    },
-
-    scales: {
-      y: {
-        type: 'linear',
-        display: true,
-        position: 'left',
-        min: 10,
-        max: 15
-      },
-      y1: {
-        type: 'linear',
-        display: true,
-        position: 'right',
-        grid: {
-          drawOnChartArea: false,
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              // Luxon format string
+              tooltipFormat: 'ff'
+            },
+            title: {
+              display: true,
+              text: 'Date'
+            },
+            min: xViewMin,
+            max: xMax,
+            ticks: {
+                major: {
+                    enabled: true
+                }
+            }
+          },
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            min: 10,
+            max: 40
+          },
+          y1: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            grid: {
+              drawOnChartArea: false,
+            },
+            min: 0,
+            max: 100
+          },
         },
-        min: 20,
-        max: 50
-      },
-    },
-    elements:{
-        line:{
-            borderWidth: 2,
-            tension: 0.2
-        }
-    },
-  };
+        elements:{
+            line:{
+                borderWidth: 2,
+                tension: 0.2
+            }
+        },
+      };
+    
+    return options;
+}
 
-function formatChartData(labels, dataset1, dataset2){
+// TODO: remove labels after refactor is complete
+function formatChartData(dataset1, dataset2){
     const data = {
-        labels,
         datasets: [
           {
             label: 'Dataset 1',
@@ -149,6 +143,7 @@ function formatChartData(labels, dataset1, dataset2){
             borderColor: 'rgb(255, 99, 132)',
             backgroundColor: 'rgba(255, 99, 132, 0.5)',
             yAxisID: 'y',
+            xAxisID: 'x',
             fill: false
 
           },
@@ -158,6 +153,7 @@ function formatChartData(labels, dataset1, dataset2){
             borderColor: 'rgb(53, 162, 235)',
             backgroundColor: 'rgba(53, 162, 235, 0.5)',
             yAxisID: 'y1',
+            xAxisID: 'x',
             fill: false,
           },
         ],
@@ -168,38 +164,32 @@ function formatChartData(labels, dataset1, dataset2){
 class Chart extends Component{
     constructor(props){
         super(props);
-        this.state = { isLoading: true, chartData: undefined};
-        // this.state = data;
- 
-
+        this.state = { isLoading: true, chartData: undefined, options: undefined};
     }
 
     componentDidMount() {
         // Add url to constants so that other computers can load data
         // This may be what's causing the CORS errors
         // axios.get('http://localhost:4000/measurements')
-        axios.get('http://192.168.0.53:4000/measurements')
+        // axios.get('http://192.168.0.53:4000/measurements')
+        axios.get('http://10.1.10.95:4000/measurements')                // Broadview Taphouse ipaddr
         .then(res => {
-            const stamps = res.data.map(s => s.createdAt)
-            let tempData1 = res.data.map(t => t.temperature)
-            let humidityData1 = res.data.map(h => h.humidity)
             let tempData = res.data.map(obj => {
                 let rObj = {}
-                rObj[obj.createdAt] = obj.temperature
+                rObj['x'] = (new Date(obj.createdAt))
+                rObj['y'] = obj.temperature
                 return rObj
             })
             let humidityData = res.data.map(obj => {
                 let rObj = {}
-                rObj[obj.createdAt] = obj.humidity
+                rObj['x'] = (new Date(obj.createdAt))
+                rObj['y'] = obj.humidity
                 return rObj
             })
-            console.log(tempData)
-            console.log(humidityData)
-            console.log(stamps)
-            // this.state.chartData = formatChartData(stamps, tempData, humidityData);
-            dataPoints = formatChartData(stamps, tempData1, humidityData1);
-            console.log(dataPoints)
+            dataPoints = formatChartData(tempData, humidityData);
+            options = setOptions(tempData);
             this.setState({chartData: dataPoints})
+            this.setState({chartOptions: options})
             this.setState({isLoading: false})
         })
     }
@@ -214,7 +204,7 @@ class Chart extends Component{
             <div className="Chart">
                 <Line
                     data={this.state.chartData}
-                    options={options}
+                    options={this.state.chartOptions}
                 /> 
             </div>
         )
