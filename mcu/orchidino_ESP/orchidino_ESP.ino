@@ -11,7 +11,7 @@
 #include <DHT.h>
 #include "constants.h"                      // Contains Wi-Fi ssid and password
 
-#define DHTTYPE DHT11
+#define DHTTYPE DHT22
 #define DHT_SENSOR_PIN 2                    // NOTE: D4 on ESP8266 NodeMCU is GPIO2
 DHT dht(DHT_SENSOR_PIN, DHTTYPE);
 
@@ -20,7 +20,7 @@ const char* password = const_password;      // declared in constants.h
 
 unsigned long lastMillis = 0;               // To be used as timer for sending temp/humidity/light at regular interval
 
-String serverName = "http://192.168.0.53:4000/measurement";     //Server rout for posting measurements
+String serverName = "http://192.168.0.53:4000/measurement";     //Server route for posting measurements
 
 void setup() {
   Serial.begin(9600);                       // Start the Serial communication to send messages to the computer
@@ -47,14 +47,17 @@ void setup() {
 void loop() {
   float temperature = dht.readTemperature();
   float humidity = dht.readHumidity();
+  float light = analogRead(A0) * (5.0 / 1023.0);      // Reads resistance on A0 and converts to volts.
 
   Serial.print(humidity);
   Serial.print("   ");
-  Serial.println(temperature);
-
+  Serial.print(temperature);
+  Serial.print("   ");
+  Serial.println(light);
+  
   delay(2000);
 
-  // Every 5 minutes send request to POST http://localhost:4000/measurements
+  // Every 5 minutes send request to POST http://192.168.0.53:4000/measurements
   int minutes = 1;
   int spm = 60;       // Shortens the wait timer during development
   if (millis() - lastMillis >= minutes*spm*1000UL) {
@@ -66,7 +69,7 @@ void loop() {
     JsonObject object = doc.to<JsonObject>();
     object["temperature"] = temperature;
     object["humidity"] = humidity;
-    object["light"] = 42;
+    object["light"] = light;
 
     // serialize the object and send the result to payload
     String payload;
