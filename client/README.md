@@ -1,3 +1,22 @@
+# Orchidino Frontend
+
+The Orchidino UI was created using React. This is my first attempt using react and this will be an evolution of libraries and components as I become more familiar
+
+The UI in its current, basic, form consists of a chart of the collected environmental data which can be navigated using the scroll wheel to zoom and clicking/dragging to pan along the data set.
+A data table of readings from the last 7 days is included for data review in tabluar form
+Finally, an export to CSV button is included to allow the user to download the entire dataset. 
+
+## To Do:
+* Add zoom limit to chart
+* Add bold formatting to major gridlines on x-axis
+* Build out Data Table component
+  * Add controls to adjust data view range
+* Build out CSS
+* Add live data components
+* Any need for a React router?
+* Add downlaod button for export to CSV
+
+# All the other boiler plate, courtesy of React
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

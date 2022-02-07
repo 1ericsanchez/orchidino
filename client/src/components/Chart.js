@@ -5,6 +5,7 @@ import {
     CategoryScale,
     LinearScale,
     PointElement,
+    BarElement,
     LineElement,
     Title,
     TimeScale,
@@ -28,6 +29,7 @@ ChartJS.register(
     TimeScale,
     PointElement,
     LineElement,
+    BarElement,
     Title,
     Tooltip,
     Legend,
@@ -134,7 +136,7 @@ function setOptions(data){
 }
 
 // TODO: remove labels after refactor is complete
-function formatChartData(dataset1, dataset2){
+function formatChartData(dataset1, dataset2, dataset3){
     const data = {
         datasets: [
           {
@@ -156,6 +158,16 @@ function formatChartData(dataset1, dataset2){
             xAxisID: 'x',
             fill: false,
           },
+          {
+            label: 'Dataset 3',
+            data: dataset3,
+            borderColor: 'rgb(53, 162, 235)',
+            backgroundColor: 'rgba(53, 162, 235, 0.5)',
+            yAxisID: 'y1',
+            xAxisID: 'x',
+            type: 'bar',
+            fill: true,
+          },
         ],
       };
     return data;
@@ -168,31 +180,78 @@ class Chart extends Component{
     }
 
     componentDidMount() {
+      if (this.props.rawData !== {}){
+
         // Add url to constants so that other computers can load data
         // This may be what's causing the CORS errors
-        // axios.get('http://localhost:4000/measurements')
-        // axios.get('http://192.168.0.53:4000/measurements')
-        axios.get('http://10.1.10.95:4000/measurements')                // Broadview Taphouse ipaddr
-        .then(res => {
-            let tempData = res.data.map(obj => {
+            let tempData = this.props.rawData.map(obj => {
                 let rObj = {}
                 rObj['x'] = (new Date(obj.createdAt))
                 rObj['y'] = obj.temperature
                 return rObj
             })
-            let humidityData = res.data.map(obj => {
+            let humidityData = this.props.rawData.map(obj => {
                 let rObj = {}
                 rObj['x'] = (new Date(obj.createdAt))
                 rObj['y'] = obj.humidity
                 return rObj
             })
-            dataPoints = formatChartData(tempData, humidityData);
+            let lightData = this.props.rawData.map(obj => {
+                let rObj = {}
+                rObj['x'] = (new Date(obj.createdAt))
+                if (obj.light > 1.5){
+                  rObj['y'] = 100;
+                } else {
+                  rObj['y'] = 0;
+                }
+                return rObj
+            })
+            dataPoints = formatChartData(tempData, humidityData, lightData);
             options = setOptions(tempData);
             this.setState({chartData: dataPoints})
             this.setState({chartOptions: options})
             this.setState({isLoading: false})
-        })
-    }
+        }
+      }
+
+
+    // componentDidMount() {
+    //     // Add url to constants so that other computers can load data
+    //     // This may be what's causing the CORS errors
+    //     // axios.get('http://localhost:4000/measurements')
+    //     // axios.get('http://192.168.0.53:4000/measurements')
+    //     axios.get('http://10.1.10.94:4000/measurements')
+    //     .then(res => {
+    //         let tempData = res.data.map(obj => {
+    //             let rObj = {}
+    //             rObj['x'] = (new Date(obj.createdAt))
+    //             rObj['y'] = obj.temperature
+    //             return rObj
+    //         })
+    //         let humidityData = res.data.map(obj => {
+    //             let rObj = {}
+    //             rObj['x'] = (new Date(obj.createdAt))
+    //             rObj['y'] = obj.humidity
+    //             return rObj
+    //         })
+    //         let lightData = res.data.map(obj => {
+    //             let rObj = {}
+    //             rObj['x'] = (new Date(obj.createdAt))
+    //             if (obj.light > 1.5){
+    //               rObj['y'] = 100;
+    //             } else {
+    //               rObj['y'] = 0;
+    //             }
+    //             return rObj
+    //         })
+    //         console.log(lightData)
+    //         dataPoints = formatChartData(tempData, humidityData, lightData);
+    //         options = setOptions(tempData);
+    //         this.setState({chartData: dataPoints})
+    //         this.setState({chartOptions: options})
+    //         this.setState({isLoading: false})
+    //     })
+    // }
 
     render() {
         const {isLoading, chartData} = this.state;
