@@ -1,33 +1,44 @@
 import React, {useMemo, Component } from 'react';
 import { useTable } from 'react-table';
+import { DateTime } from "luxon";
 
 export default function Table({ rawData }){
     console.log("raw data",rawData)
-    const data = useMemo(() => rawData);
+
+    // Create an object with the data from the database. Main point is to parse and format the createdAt date string.
+    // temp readings seem to be close to 1 decimal accuracy  +/- ~0.0000004
+    let parsedData = rawData.map(obj => {
+        let rObj = {}
+        rObj['createdAt'] = DateTime.fromISO(obj.createdAt).toFormat('LL/dd T')
+        rObj['temperature'] = obj.temperature.toFixed(1)
+        rObj['humidity'] = obj.humidity.toFixed(1)
+        rObj['light'] = obj.light.toFixed(2)
+        return rObj
+    })
+    console.log("parsed data",parsedData)
+
+    const data = useMemo(() => parsedData, []);
     
     const columns = useMemo(
       () => [
         {
-          Header: 'Temperature',
-          accessor: 'temperature', // accessor is the "key" in the data
-        },
-        {
-          Header: 'Created At',
+          Header: 'Time',
           accessor: 'createdAt',
         },
         {
-          Header: 'Humidity',
+          Header: 'Temp  (F)',
+          accessor: 'temperature', // accessor is the "key" in the data
+        },
+        {
+          Header: 'RH  (%)',
           accessor: 'humidity',
         },
         {
-          Header: 'light',
+          Header: 'light  (v)',
           accessor: 'light',
         },
-        {
-          Header: 'Updated At',
-          accessor: 'updatedAt',
-        },
-      ]
+      ],
+      []
     ) 
 
     const {
