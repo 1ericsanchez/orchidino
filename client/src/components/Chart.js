@@ -166,6 +166,8 @@ function formatChartData(dataset1, dataset2, dataset3){
             yAxisID: 'y1',
             xAxisID: 'x',
             type: 'bar',
+            barPercentage: 1.0,
+            categoryPercentage: 1.0,
             fill: true,
           },
         ],

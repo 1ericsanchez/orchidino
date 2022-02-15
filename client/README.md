@@ -9,11 +9,12 @@ Finally, an export to CSV button is included to allow the user to download the e
 ## To Do:
 * Add zoom limit to chart
 * Add bold formatting to major gridlines on x-axis
-* Build out Data Table component
+* ~~Build out Data Table component~~
   * Add controls to adjust data view range
 * Build out CSS
 * Add live data components
-* Any need for a React router?
+* Add Navbar
+* Add routes
 * Add downlaod button for export to CSV
 
 # All the other boiler plate, courtesy of React
